@@ -122,12 +122,16 @@ function gen_output(config_file)
             return "", ERR_INVALID_FIELD
         end
         -- HTTPS
+        local target = v.target
+        if v.target_https then
+            target = v.target_https
+        end
         if v.https == "no" then
             --
         elseif v.https == "server" then
-            ret = ret..make_block(true, false, server_name, key_path, v.target).."\n"
+            ret = ret..make_block(true, false, server_name, key_path, target).."\n"
         elseif v.https == "proxy" then
-            ret = ret..make_block(true, true, server_name, key_path, v.target).."\n"
+            ret = ret..make_block(true, true, server_name, key_path, target).."\n"
         elseif v.https == "auto" then
             ret = ret..make_block(true, true, server_name, key_path, "http://"..server_name).."\n"
         else
