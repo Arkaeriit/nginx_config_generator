@@ -4,7 +4,7 @@ key_path = "/etc/letsencrypt/live/"
 hosts = {
         www = { -- configuration for a webserver at the URL www.example.xyz
                 http = "server",
-                https = "auto",
+                https = "server",
                 target = "/srv",
         },
         google = { -- google.example.xyz proxies to google.com
@@ -23,16 +23,15 @@ hosts = {
                 target = "https://other_website.xyz",
                 target_https = "/srv/website",
         },
-        website = { -- A single host can have different targets for http and https
-                http = "proxy",
-                https = "server",
-                target = "https://other_website.xyz",
-                target_https = "/srv/website",
-        },
         blog = {
                 http = "server",
-                https = "auto", -- The `auto` target will make the https://blog.example.xyz a proxy to http://blog.example.xyz
+                https = "auto", -- The `auto` directive will make the https://blog.example.xyz a proxy to http://blog.example.xyz
                 target = "/srv/blog",
+        },
+        cooking = {
+                http = "no", -- The `no` directive will make cooking.example.xyz only accessible with HTTPS and not HTTP
+                https = "server",
+                target = "/srv/cooking",
         },
 }
 
