@@ -65,8 +65,17 @@ function make_block(is_https, is_proxy, server_name, key_path, target)
         key_path)
 end
 
+----------------------------------- Error codes --------------------------------
+
+ERR_OK                = 0
+ERR_MISSING_CONFIG    = 1
+ERR_MISSING_FIELD     = 2
+ERR_INVALID_FIELD     = 3
+ERR_INVALID_ARGUMENTS = 4
+
 ------------------- Generating output from input configuration -----------------
 
+-- Generates a full URL for the host at the desired domain name.
 local function gen_servername(host, domain_name)
     if host == "@" or host == "" then
         return domain_name
@@ -75,20 +84,22 @@ local function gen_servername(host, domain_name)
     end
 end
 
+-- Reads the configuration file given as argument and return the generated
+-- nginx configuration and an error code.
 function gen_output(config_file)
     dofile(config_file)
     -- Error checking
     if type(domain_name) ~= "string" then
         io.stderr:write("Error, the domain name has not be specified as a string.")
-        return "", 1
+        return "", ERR_MISSING_CONFIG
     end
     if type(key_path) ~= "string" then
         io.stderr:write("Error, the keys path has not be specified as a string.")
-        return "", 1
+        return "", ERR_MISSING_CONFIG
     end
     if type(hosts) ~= "table" then
         io.stderr:write("Error, the host list has not be specified as a table.")
-        return "", 1
+        return "", ERR_MISSING_CONFIG
     end
     -- Main processing
     ret = ""
@@ -97,7 +108,7 @@ function gen_output(config_file)
         -- Error checking
         if type(v.http) ~= "string" or type(v.https) ~= "string" or type(v.target) ~= "string"then
         io.stderr:write("Error, fields `http`, `https`, and `target` should be specified for the host '", k,"'.\n")
-        return "", 2
+        return "", ERR_MISSING_FIELD
         end
         -- HTTP
         if v.http == "no" then
@@ -108,7 +119,7 @@ function gen_output(config_file)
             ret = ret..make_block(false, true, server_name, key_path, v.target).."\n"
         else
             io.stderr:write('Error, the value of the `http` field for the host "', k, '" should be "no", "server", or "proxy".\n')
-            return "", 3
+            return "", ERR_INVALID_FIELD
         end
         -- HTTPS
         if v.https == "no" then
@@ -121,10 +132,10 @@ function gen_output(config_file)
             ret = ret..make_block(true, true, server_name, key_path, "http://"..server_name).."\n"
         else
             io.stderr:write('Error, the value of the `https` field for the host "', k, '" should be "no", "auto", "server", or "proxy".\n')
-            return "", 3
+            return "", ERR_INVALID_FIELD
         end
     end
-    return ret, 0
+    return ret, ERR_OK
 
 end
 
@@ -133,16 +144,20 @@ end
 function main()
     if #arg ~= 1 then
         io.stderr:write("Error invalid arguments.\n", "Do nginx_config_generator.lua --help for more info.\n")
-        return -1
+        return ERR_INVALID_ARGUMENTS
     end
     if arg[1] == "help" or arg[1] == "--help" or arg[1] == "-h" then
         help()
-        return 0
+        return ERR_OK
     else
         str, rc = gen_output(arg[1])
         print(str)
         return rc
     end
+end
+
+function help()
+    print("TODO")
 end
     
 os.exit(main())
