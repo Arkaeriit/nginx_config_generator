@@ -1,5 +1,33 @@
 #!/usr/bin/env lua
 
+documentation = [[Usage:
+./nginx_config_generator.lua <config.lua>
+
+# Lua config file
+
+## Top level configuration
+
+The Lua config have to specify 3 variable:
+
+* `domain_name`: Your domain name such as `"example.xyz"`
+* `key_path`: The path to your SSL keys such as `"/etc/letsencrypt/live/"` if you are using certbot.
+* `hosts`: A table whose keys are the host names and whose values are a table with the host's configuration.
+
+## Host configuration
+
+The configuration for each host is a table, this table must have the fields `http`, `https`, and `target`.
+
+The field `http` can have the following value:
+
+* `"no"`: In that case, the server does not serves HTTP on this host.
+* `"server"`: The host will act as a web server. The path to the files to serve are in the `target` field.
+* `"proxy"`: The host will act as a proxy. The target URL must be in the `target` field.
+
+The field `https` can have the same values or the `"auto"` value which make so that the HTTPS host acts as a proxy for the HTTP host.
+
+By default, the HTTP and HTTPS hosts will have the same targets. But you can specify a different target for the HTTPS host in the field `target_https`.
+]]
+
 ------------------------------ Making server block. ----------------------------
 
 -- Put the desired content in a basic http block. The last argument is unused
@@ -161,7 +189,7 @@ function main()
 end
 
 function help()
-    print("TODO")
+    print(documentation)
 end
     
 os.exit(main())
