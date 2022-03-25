@@ -77,7 +77,7 @@ ERR_INVALID_ARGUMENTS = 4
 
 -- Generates a full URL for the host at the desired domain name.
 local function gen_servername(host, domain_name)
-    if host == "@" or host == "" then
+    if host == "" then
         return domain_name
     else
         return host.."."..domain_name
