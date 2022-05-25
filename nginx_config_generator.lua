@@ -70,6 +70,17 @@ end
 -- Generate the main content for a nginx proxy.
 local function proxy_content(destination)
     local ret = "    location / {\n"
+    ret =  ret.."        proxy_set_header Host $host;\n"
+    ret =  ret.."        proxy_set_header X-Real-IP $remote_addr;\n"
+    ret =  ret.."        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n"
+    ret =  ret.."        proxy_set_header X-Forwarded-Proto $scheme;\n"
+    ret =  ret.."        add_header Front-End-Https on;\n"
+    ret =  ret.."        proxy_headers_hash_max_size 512;\n"
+    ret =  ret.."        proxy_headers_hash_bucket_size 64;\n"
+    ret =  ret.."        client_max_body_size 1G;\n"
+    ret =  ret.."        proxy_buffering off;\n"
+    ret =  ret.."        proxy_redirect off;\n"
+    ret =  ret.."        proxy_max_temp_file_size 0;\n"
     ret =  ret.."        proxy_pass "..destination..";\n"
     ret =  ret.."    }\n"
     return ret
