@@ -86,10 +86,15 @@ local function proxy_content(destination)
     return ret
 end
 
+-- Generate the main content for a redirection
+local function redirection_content(destination)
+    return "return 301 "..destination..";\n"
+end
+
 -- Generate a complete server block. `is_http` and `is_proxy` are booleans used
 -- to tell what kind of block to create. `target` is either the path to the web
 -- pages or the URL of the proxy's target.
-function make_block(is_https, is_proxy, server_name, key_path, target)
+function make_block(is_https, is_proxy, is_redirection, server_name, key_path, target)
     local frame_func = http_frame
     if is_https then
         frame_func = https_frame
@@ -97,6 +102,9 @@ function make_block(is_https, is_proxy, server_name, key_path, target)
     local content_func = server_content
     if is_proxy then
         content_func = proxy_content
+    end
+    if is_redirection then
+        content_func = redirection_content
     end
     return frame_func(
         server_name,
@@ -153,9 +161,11 @@ function gen_output(config_file)
         if v.http == "no" then
             --
         elseif v.http == "server" then
-            ret = ret..make_block(false, false, server_name, key_path, v.target).."\n"
+            ret = ret..make_block(false, false, false, server_name, key_path, v.target).."\n"
         elseif v.http == "proxy" then
-            ret = ret..make_block(false, true, server_name, key_path, v.target).."\n"
+            ret = ret..make_block(false, true, false, server_name, key_path, v.target).."\n"
+        elseif v.http == "redirection" then
+            ret = ret..make_block(false, false, true, server_name, key_path, v.target).."\n"
         else
             io.stderr:write('Error, the value of the `http` field for the host "', k, '" should be "no", "server", or "proxy".\n')
             return "", ERR_INVALID_FIELD
@@ -168,11 +178,13 @@ function gen_output(config_file)
         if v.https == "no" then
             --
         elseif v.https == "server" then
-            ret = ret..make_block(true, false, server_name, key_path, target).."\n"
+            ret = ret..make_block(true, false, false, server_name, key_path, target).."\n"
         elseif v.https == "proxy" then
-            ret = ret..make_block(true, true, server_name, key_path, target).."\n"
+            ret = ret..make_block(true, true, false, server_name, key_path, target).."\n"
         elseif v.https == "auto" then
-            ret = ret..make_block(true, true, server_name, key_path, "http://"..server_name).."\n"
+            ret = ret..make_block(true, true, false, server_name, key_path, "http://"..server_name).."\n"
+        elseif v.http == "redirection" then
+            ret = ret..make_block(true, false, true, server_name, key_path, v.target).."\n"
         else
             io.stderr:write('Error, the value of the `https` field for the host "', k, '" should be "no", "auto", "server", or "proxy".\n')
             return "", ERR_INVALID_FIELD

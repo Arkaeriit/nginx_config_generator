@@ -27,6 +27,7 @@ The field `http` can have the following value:
 * `"no"`: In that case, the server does not serves HTTP on this host.
 * `"server"`: The host will act as a web server. The path to the files to serve are in the `target` field.
 * `"proxy"`: The host will act as a proxy. The target URL must be in the `target` field.
+* `"redirection"`: The host will redirect to the URL in the `target` field.
 
 The field `https` can have the same values or the `"auto"` value which make so that the HTTPS host acts as a proxy for the HTTP host.
 

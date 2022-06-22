@@ -33,5 +33,11 @@ hosts = {
                 https = "server",
                 target = "/srv/cooking",
         },
+        safesite = {
+                http = "redirection",
+                https = "server",
+                target = "https://$host$request_uri", -- The http request will be redirected to https
+                target_https = "/srv/safesite",
+        },
 }
 
