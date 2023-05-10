@@ -41,3 +41,6 @@ hosts = {
         },
 }
 
+extra = [[
+# This is a comment that will be added at the end of the config file.
+]]

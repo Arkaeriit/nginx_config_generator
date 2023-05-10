@@ -12,11 +12,12 @@ A tool to generate Nginx config file from a compact Lua table.
 
 ### Top level configuration
 
-The Lua config have to specify 3 variable:
+The Lua config have to specify 4 variables:
 
 * `domain_name`: Your domain name such as `"example.xyz"`
 * `key_path`: The path to your SSL keys such as `"/etc/letsencrypt/live/"` if you are using certbot.
 * `hosts`: A table whose keys are the host names and whose values are a table with the host's configuration.
+* `extra`: An optional string that will be added as-is on the output file.
 
 ### Host configuration
 

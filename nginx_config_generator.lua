@@ -190,8 +190,14 @@ function gen_output(config_file)
             return "", ERR_INVALID_FIELD
         end
     end
+    if extra then
+        if type(extra) ~= "string" then
+            io.stderr:write("Error, the extra content has not be specified as a string.")
+            return "", ERR_MISSING_CONFIG
+        end
+        ret = ret .. "\n" .. extra .. "\n"        
+    end
     return ret, ERR_OK
-
 end
 
 -------------------------------------- Main ------------------------------------
